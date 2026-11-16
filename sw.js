@@ -1,10 +1,13 @@
-// Offline cache for Razorfen Crawl. Bump VERSION whenever the game changes
-// so phones pick up the new build.
-const VERSION = 'rfc-v3';
+// Offline cache for Razorfen Crawl. Bump VERSION (and RFC_BUILD in index.html)
+// whenever the game changes so installed apps pick up the new build.
+const VERSION = 'rfc-v4';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
+  // cache: 'reload' skips the browser's HTTP cache so we store the fresh files.
+  e.waitUntil(caches.open(VERSION)
+    .then(c => c.addAll(CORE.map(u => new Request(u, { cache: 'reload' }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -17,14 +20,16 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  // The game page: try the network first so updates arrive, fall back to cache offline.
+  // The game page: always ask the network for the newest copy (bypassing the
+  // HTTP cache), and fall back to the saved copy when offline.
   if (req.mode === 'navigate') {
-    e.respondWith(fetch(req).then(r => {
-      const copy = r.clone(); caches.open(VERSION).then(c => c.put('index.html', copy)); return r;
+    e.respondWith(fetch(req.url, { cache: 'no-store' }).then(r => {
+      if (r.ok) { const copy = r.clone(); caches.open(VERSION).then(c => c.put('index.html', copy)); }
+      return r;
     }).catch(() => caches.match('index.html')));
     return;
   }
-  // Everything else (icons, Google Fonts): cache first, then network, and keep a copy.
+  // Icons and Google Fonts: cache first, then network, keeping a copy.
   const sameOrigin = url.origin === location.origin;
   const fonts = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
   if (!sameOrigin && !fonts) return;
