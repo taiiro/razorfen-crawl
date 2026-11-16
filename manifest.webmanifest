@@ -1,0 +1,17 @@
+{
+  "name": "Razorfen Crawl",
+  "short_name": "Razorfen",
+  "description": "A first-person quilboar dungeon crawler. Mine blood stones, fight off invading adventurers and get them home to the Warren.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#0b0806",
+  "theme_color": "#0b0806",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
