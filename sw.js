@@ -1,6 +1,6 @@
 // Offline cache for Razorfen Crawl. Bump VERSION (and RFC_BUILD in index.html)
 // whenever the game changes so installed apps pick up the new build.
-const VERSION = 'rfc-v4';
+const VERSION = 'rfc-v5';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
